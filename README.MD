@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="/banner.png'" alt="Astra banner" />
+	<img src="/banner.png" alt="Astra banner" />
 </p>
 
 <h1 align="center">Astra Browser Engine</h1>
