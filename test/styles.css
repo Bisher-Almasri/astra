@@ -1,0 +1,13 @@
+h2 {
+  height: 4px;
+}
+* {
+  color: red;
+}
+:root {
+  --color-red: #ff0000;
+}
+h2,
+h1:active {
+  color: var(--color-red);
+}

@@ -1,43 +1,10 @@
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub enum NodeType {
-    Element(ElementData),
-    Text(String),
-}
+use crate::dom::Node;
 
-#[derive(Debug, Clone)]
-pub struct ElementData {
-    pub tag_name: String,
-    pub attributes: AttrMap,
-}
+#[cfg(test)]
+mod html_test;
 
-pub type AttrMap = HashMap<String, String>;
-
-#[derive(Debug)]
-pub struct Node {
-    pub children: Vec<Node>,
-    pub node_type: NodeType,
-}
-
-impl Node {
-    pub fn text(data: String) -> Node {
-        Node {
-            children: vec![],
-            node_type: NodeType::Text(data),
-        }
-    }
-
-    pub fn element(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
-        Node {
-            children,
-            node_type: NodeType::Element(ElementData {
-                tag_name: name,
-                attributes: attrs,
-            }),
-        }
-    }
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseError {
@@ -110,21 +77,23 @@ impl HtmlTokenizer {
     }
 
     fn current_char(&self) -> Result<char, ParseError> {
-        self.input
+        self.input[self.position..]
             .chars()
-            .nth(self.position)
+            .next()
             .ok_or(ParseError::UnexpectedEof)
     }
 
     fn advance(&mut self) {
-        self.position += 1;
+        if let Some(ch) = self.input[self.position..].chars().next() {
+            self.position += ch.len_utf8();
+        }
     }
 
     fn skip_whitespace(&mut self) {
         while self.position < self.input.len() {
-            if let Some(ch) = self.input.chars().nth(self.position) {
+            if let Some(ch) = self.input[self.position..].chars().next() {
                 if ch.is_whitespace() {
-                    self.advance()
+                    self.position += ch.len_utf8();
                 } else {
                     break;
                 }
@@ -368,10 +337,10 @@ impl HtmlParser {
                     self_closing,
                 } => {
                     if self_closing || is_void_element(&name) {
-                        nodes.push(Node::element(name, attributes, vec![]));
+                        nodes.push(Node::elem(name, attributes, vec![]));
                     } else {
                         let children = self.parse_children(&name)?;
-                        nodes.push(Node::element(name, attributes, children));
+                        nodes.push(Node::elem(name, attributes, children));
                     }
                 }
                 Token::EndTag { .. } => {
@@ -384,7 +353,7 @@ impl HtmlParser {
         if nodes.len() == 1 {
             Ok(nodes.into_iter().next().unwrap())
         } else {
-            Ok(Node::element("document".to_string(), HashMap::new(), nodes))
+            Ok(Node::elem("document".to_string(), HashMap::new(), nodes))
         }
     }
 
@@ -408,10 +377,10 @@ impl HtmlParser {
                     self_closing,
                 } => {
                     if self_closing || is_void_element(&name) {
-                        children.push(Node::element(name, attributes, vec![]));
+                        children.push(Node::elem(name, attributes, vec![]));
                     } else {
                         let grandchildren = self.parse_children(&name)?;
-                        children.push(Node::element(name, attributes, grandchildren));
+                        children.push(Node::elem(name, attributes, grandchildren));
                     }
                 }
                 Token::EndTag { name } => {
