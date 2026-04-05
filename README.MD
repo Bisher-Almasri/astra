@@ -1,6 +1,12 @@
-# Astra Browser Engine
+<p align="center">
+	<img src="/banner.png'" alt="Astra banner" />
+</p>
 
-Astra is an experimental browser engine written in Rust.
+<h1 align="center">Astra Browser Engine</h1>
+
+<p align="center">
+	An experimental browser engine written in Rust.
+</p>
 
 It currently includes a full mini pipeline:
 
