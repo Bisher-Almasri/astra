@@ -181,6 +181,10 @@ impl Browser {
         self.history.get(self.history_index).map(String::as_str)
     }
 
+    pub fn get_html(&self, url: &str) -> Option<&str> {
+        self.resource_cache.get_cached(url)
+    }
+
     pub fn can_go_back(&self) -> bool {
         !self.history.is_empty() && self.history_index > 0
     }

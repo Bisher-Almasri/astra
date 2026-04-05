@@ -22,6 +22,7 @@ fn main() {
     }
 
     let _ = browser.load("test/index.html");
+    let html = browser.get_html("test/index.html").unwrap_or("").to_string();
     println!(
         "History length: {}  |  current: {}",
         browser.history.len(),
@@ -40,5 +41,13 @@ fn main() {
         println!("Navigated forward to: {}", next);
     }    
 
+    let scripts = js::extract_scripts(&html);
+    let mut runtime = js::JsRuntime::new();
+    for script in scripts {
+        match runtime.execute(&script) {
+            Ok(_) => println!("Executed script successfully."),
+            Err(e) => eprintln!("JS Error: {}", e.message),
+        }
+    }
     println!("Done.");
 }
