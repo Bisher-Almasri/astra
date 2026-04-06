@@ -5,7 +5,7 @@
 <h1 align="center">Astra Browser Engine</h1>
 
 <p align="center">
-	An experimental browser engine written in Rust.
+	A browser engine base written in Rust.
 </p>
 
 It currently includes a full mini pipeline:
